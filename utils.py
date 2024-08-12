@@ -27,19 +27,30 @@ def add_industry_share_col(df, col):
     )
 
 
-def line_plot(df, x, y, by, title, frame_width=None):
-    return df.sort(x).plot.line(x=x, y=y, by=by, title=title, frame_width=frame_width)
-
-
-def line_plot_normalized(df, x, y, by, title, norm_x_value=2019, frame_width=None):
-    normalized_y_col_name = f"{y}-normalized_to_{norm_x_value}"
-    add_normalization_col(df, x, y, normalized_y_col_name, norm_x_value=norm_x_value)
-    return line_plot(
-        df, x, normalized_y_col_name, by, title=title, frame_width=frame_width
+def line_plot(df, x, y, by, title, frame_width=None, legend=True):
+    return df.sort(x).plot.line(
+        x=x, y=y, by=by, title=title, frame_width=frame_width, legend=legend
     )
 
 
-def stacked_bar_plot(df, y, geography, by, title, years, frame_width=None):
+def line_plot_normalized(
+    df, x, y, by, title, norm_x_value=2019, frame_width=None, legend=True
+):
+    normalized_y_col_name = f"{y}-normalized_to_{norm_x_value}"
+    return line_plot(
+        add_normalization_col(
+            df, x, y, normalized_y_col_name, norm_x_value=norm_x_value
+        ),
+        x,
+        normalized_y_col_name,
+        by,
+        title=title,
+        frame_width=frame_width,
+        legend=legend,
+    )
+
+
+def stacked_bar_plot(df, y, geography, by, title, years, frame_width=None, legend=True):
     return (
         df.filter(pl.col("geography") == geography, pl.col("Year").is_in(years))
         .sort("Year", by)
@@ -50,5 +61,34 @@ def stacked_bar_plot(df, y, geography, by, title, years, frame_width=None):
             stacked=True,
             title=title,
             frame_width=frame_width,
+            legend=legend,
         )
     )
+
+
+def paired_line_plots(df, x, y, by, ymin=None, frame_width=None):
+    sf_plot = df.filter(pl.col("geography") == "San Francisco").plot.line(
+        x=x,
+        y=y,
+        by=by,
+        # stacked=True,
+        title="San Francisco",
+        ylim=(ymin, None),
+        frame_width=frame_width,
+        # frame_height=200,
+        xticks=df.select(x).unique(),
+        legend=False,
+    )
+    bayarea_plot = df.filter(pl.col("geography") == "Bay Area").plot.line(
+        x=x,
+        y=y,
+        by=by,
+        # stacked=True,
+        title="Bay Area",
+        ylim=(ymin, None),
+        frame_width=frame_width,
+        # frame_height=200,
+        xticks=df.select(x).unique(),
+        legend=True,
+    )
+    return sf_plot + bayarea_plot
