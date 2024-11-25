@@ -3,8 +3,8 @@ import altair as alt
 color_transit_teal = "#006c69"
 color_value_transit_teal = alt.value(color_transit_teal)
 
-# pre, post, neutral/both
-color_covid_pre_post_neutral = ["#ff8d6b", "#63acc9", "#6d6d6d"]
+color_covid_pre_post_both = ["#ff8d6b", "#63acc9", "#6d6d6d"]
+color_worse_better_neutral = color_covid_pre_post_both
 
 color_line_blue_green = ["#73abbe", "#cccc3d"]
 color_fill_blue_green = ["#5eb3e4", "#d3d655"]
